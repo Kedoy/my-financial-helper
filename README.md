@@ -115,30 +115,6 @@ docker compose exec -T postgres psql -U fin_user -d fin_db < backup.sql
 
 ---
 
-## Тестирование
-
-### Проверка статуса
-```bash
-docker compose ps
-```
-
-### Проверка backend
-```bash
-curl http://localhost:8000/api/health/
-```
-
-### Проверка frontend
-```bash
-curl http://localhost:80
-```
-
-### API документация
-```bash
-curl http://localhost:8000/api/docs/
-```
-
----
-
 ## Лицензия
 
 MIT License — см. файл [LICENSE](LICENSE)
