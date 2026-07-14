@@ -1,0 +1,1 @@
+/usr/bin/postgres "-D" "/home/avekedoy/Ks_Financial-App/backend/postgres_data"

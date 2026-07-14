@@ -1,0 +1,5 @@
+# SSL certificates directory
+# Add your SSL certificates here for production:
+# - fullchain.pem
+# - privkey.pem
+# - chain.pem

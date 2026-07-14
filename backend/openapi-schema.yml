@@ -1,0 +1,2516 @@
+openapi: 3.0.3
+info:
+  title: Ks Financial App API
+  version: 1.0.0
+  description: |2
+
+    ## API для системы учёта и анализа персональных финансов
+
+    ### Аутентификация
+    - Используйте **POST /api/v1/auth/login/** для получения токенов
+    - Access token передавайте в заголовке: `Authorization: Bearer <token>`
+    - Refresh token автоматически устанавливается в HttpOnly cookie
+
+    ### Основные эндпоинты
+    - **Транзакции** - CRUD операций с финансами
+    - **Категории** - управление категориями
+    - **Аналитика** - статистика и AI рекомендации
+    - **Блог** - посты и комментарии
+
+    ### AI Функционал
+    - **AI Рекомендации** - персональные советы по экономии
+    - **SMS Парсинг** - автоматическое создание транзакций из SMS
+paths:
+  /api/v1/analytics/ai-insights/:
+    get:
+      operationId: v1_analytics_ai_insights_retrieve
+      description: |-
+        AI-рекомендации от внешнего API.
+        GET /api/v1/analytics/ai-insights/?days=30
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/analytics/daily/:
+    get:
+      operationId: v1_analytics_daily_retrieve
+      description: |-
+        Динамика расходов по дням.
+        GET /api/v1/analytics/daily/?days=30
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/analytics/monthly/:
+    get:
+      operationId: v1_analytics_monthly_retrieve
+      description: |-
+        Динамика расходов по месяцам.
+        GET /api/v1/analytics/monthly/?months=12
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/analytics/summary/:
+    get:
+      operationId: v1_analytics_summary_retrieve
+      description: |-
+        Общая сводка за период.
+        GET /api/v1/analytics/summary/?days=30
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/auth/login/:
+    post:
+      operationId: v1_auth_login_create
+      description: |-
+        Вход пользователя с установкой Refresh Token в Cookie.
+        POST /api/v1/auth/login/
+
+        Body:
+        {
+            "email": "user@example.com",
+            "password": "password123"
+        }
+        или
+        {
+            "username": "user@example.com",
+            "password": "password123"
+        }
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPairRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPairRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPairRequest'
+        required: true
+      responses:
+        '200':
+          description: No response body
+  /api/v1/auth/logout/:
+    post:
+      operationId: v1_auth_logout_create
+      description: |-
+        Выход пользователя с очисткой Cookie.
+        POST /api/v1/auth/logout/
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/auth/me/:
+    get:
+      operationId: v1_auth_me_retrieve
+      description: |-
+        Просмотр и обновление профиля пользователя.
+        GET/PUT /api/v1/auth/me/
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    put:
+      operationId: v1_auth_me_update
+      description: |-
+        Просмотр и обновление профиля пользователя.
+        GET/PUT /api/v1/auth/me/
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    patch:
+      operationId: v1_auth_me_partial_update
+      description: |-
+        Просмотр и обновление профиля пользователя.
+        GET/PUT /api/v1/auth/me/
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/v1/auth/password/reset/:
+    post:
+      operationId: v1_auth_password_reset_create
+      description: |-
+        Запрос на сброс пароля.
+        POST /api/v1/auth/password/reset/
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequestRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordResetRequest'
+          description: ''
+  /api/v1/auth/password/reset/confirm/:
+    post:
+      operationId: v1_auth_password_reset_confirm_create
+      description: |-
+        Подтверждение сброса пароля.
+        POST /api/v1/auth/password/reset/confirm/
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/auth/profile/:
+    get:
+      operationId: v1_auth_profile_retrieve
+      description: |-
+        Детальное управление профилем (avatar, bio, currency).
+        GET/PUT /api/v1/auth/profile/
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+          description: ''
+    put:
+      operationId: v1_auth_profile_update
+      description: |-
+        Детальное управление профилем (avatar, bio, currency).
+        GET/PUT /api/v1/auth/profile/
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProfileUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProfileUpdateRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileUpdate'
+          description: ''
+    patch:
+      operationId: v1_auth_profile_partial_update
+      description: |-
+        Детальное управление профилем (avatar, bio, currency).
+        GET/PUT /api/v1/auth/profile/
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProfileRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProfileRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProfileRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+          description: ''
+  /api/v1/auth/refresh/:
+    post:
+      operationId: v1_auth_refresh_create
+      description: |-
+        Обновление токена из Cookie.
+        POST /api/v1/auth/refresh/
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/v1/auth/register/:
+    post:
+      operationId: v1_auth_register_create
+      description: |-
+        Регистрация нового пользователя.
+        POST /api/v1/auth/register/
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCreate'
+          description: ''
+  /api/v1/blog/comments/:
+    get:
+      operationId: v1_blog_comments_list
+      description: ViewSet для управления комментариями.
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCommentList'
+          description: ''
+    post:
+      operationId: v1_blog_comments_create
+      description: ViewSet для управления комментариями.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CommentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CommentRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: ''
+  /api/v1/blog/comments/{id}/:
+    get:
+      operationId: v1_blog_comments_retrieve
+      description: ViewSet для управления комментариями.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Комментарий.
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: ''
+    put:
+      operationId: v1_blog_comments_update
+      description: ViewSet для управления комментариями.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Комментарий.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CommentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CommentRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: ''
+    patch:
+      operationId: v1_blog_comments_partial_update
+      description: ViewSet для управления комментариями.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Комментарий.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCommentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCommentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCommentRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: ''
+    delete:
+      operationId: v1_blog_comments_destroy
+      description: ViewSet для управления комментариями.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Комментарий.
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/blog/posts/:
+    get:
+      operationId: v1_blog_posts_list
+      description: |-
+        ViewSet для управления постами.
+        - list: Список постов (публичные + свои приватные)
+        - create: Создать пост
+        - retrieve: Получить пост
+        - update: Обновить пост
+        - destroy: Удалить пост
+        - like: Лайкнуть пост
+        - unlike: Убрать лайк
+        - comments: Комментарии к посту
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: visibility
+        schema:
+          type: string
+          title: Видимость
+          enum:
+          - private
+          - public
+        description: |-
+          * `public` - Публичный
+          * `private` - Приватный
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPostList'
+          description: ''
+    post:
+      operationId: v1_blog_posts_create
+      description: |-
+        ViewSet для управления постами.
+        - list: Список постов (публичные + свои приватные)
+        - create: Создать пост
+        - retrieve: Получить пост
+        - update: Обновить пост
+        - destroy: Удалить пост
+        - like: Лайкнуть пост
+        - unlike: Убрать лайк
+        - comments: Комментарии к посту
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostCreateUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PostCreateUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PostCreateUpdateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostCreateUpdate'
+          description: ''
+  /api/v1/blog/posts/{id}/:
+    get:
+      operationId: v1_blog_posts_retrieve
+      description: |-
+        ViewSet для управления постами.
+        - list: Список постов (публичные + свои приватные)
+        - create: Создать пост
+        - retrieve: Получить пост
+        - update: Обновить пост
+        - destroy: Удалить пост
+        - like: Лайкнуть пост
+        - unlike: Убрать лайк
+        - comments: Комментарии к посту
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Пост.
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+          description: ''
+    put:
+      operationId: v1_blog_posts_update
+      description: |-
+        ViewSet для управления постами.
+        - list: Список постов (публичные + свои приватные)
+        - create: Создать пост
+        - retrieve: Получить пост
+        - update: Обновить пост
+        - destroy: Удалить пост
+        - like: Лайкнуть пост
+        - unlike: Убрать лайк
+        - comments: Комментарии к посту
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Пост.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostCreateUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PostCreateUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PostCreateUpdateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostCreateUpdate'
+          description: ''
+    patch:
+      operationId: v1_blog_posts_partial_update
+      description: |-
+        ViewSet для управления постами.
+        - list: Список постов (публичные + свои приватные)
+        - create: Создать пост
+        - retrieve: Получить пост
+        - update: Обновить пост
+        - destroy: Удалить пост
+        - like: Лайкнуть пост
+        - unlike: Убрать лайк
+        - comments: Комментарии к посту
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Пост.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPostCreateUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPostCreateUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPostCreateUpdateRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostCreateUpdate'
+          description: ''
+    delete:
+      operationId: v1_blog_posts_destroy
+      description: |-
+        ViewSet для управления постами.
+        - list: Список постов (публичные + свои приватные)
+        - create: Создать пост
+        - retrieve: Получить пост
+        - update: Обновить пост
+        - destroy: Удалить пост
+        - like: Лайкнуть пост
+        - unlike: Убрать лайк
+        - comments: Комментарии к посту
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Пост.
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/blog/posts/{id}/add_comment/:
+    post:
+      operationId: v1_blog_posts_add_comment_create
+      description: Добавить комментарий к посту.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Пост.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PostRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PostRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+          description: ''
+  /api/v1/blog/posts/{id}/comments/:
+    get:
+      operationId: v1_blog_posts_comments_retrieve
+      description: Получить комментарии к посту.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Пост.
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+          description: ''
+  /api/v1/blog/posts/{id}/like/:
+    post:
+      operationId: v1_blog_posts_like_create
+      description: Лайкнуть пост.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Пост.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PostRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PostRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+          description: ''
+  /api/v1/blog/posts/{id}/unlike/:
+    post:
+      operationId: v1_blog_posts_unlike_create
+      description: Убрать лайк с поста.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Пост.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PostRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PostRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+          description: ''
+  /api/v1/categories/:
+    get:
+      operationId: v1_categories_list
+      description: |-
+        CRUD для категорий.
+
+        list: GET /api/v1/categories/
+        create: POST /api/v1/categories/
+        retrieve: GET /api/v1/categories/{id}/
+        update: PUT /api/v1/categories/{id}/
+        destroy: DELETE /api/v1/categories/{id}/
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCategoryList'
+          description: ''
+    post:
+      operationId: v1_categories_create
+      description: |-
+        CRUD для категорий.
+
+        list: GET /api/v1/categories/
+        create: POST /api/v1/categories/
+        retrieve: GET /api/v1/categories/{id}/
+        update: PUT /api/v1/categories/{id}/
+        destroy: DELETE /api/v1/categories/{id}/
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CategoryCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CategoryCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryCreate'
+          description: ''
+  /api/v1/categories/{id}/:
+    get:
+      operationId: v1_categories_retrieve
+      description: |-
+        CRUD для категорий.
+
+        list: GET /api/v1/categories/
+        create: POST /api/v1/categories/
+        retrieve: GET /api/v1/categories/{id}/
+        update: PUT /api/v1/categories/{id}/
+        destroy: DELETE /api/v1/categories/{id}/
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+    put:
+      operationId: v1_categories_update
+      description: |-
+        CRUD для категорий.
+
+        list: GET /api/v1/categories/
+        create: POST /api/v1/categories/
+        retrieve: GET /api/v1/categories/{id}/
+        update: PUT /api/v1/categories/{id}/
+        destroy: DELETE /api/v1/categories/{id}/
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CategoryUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CategoryUpdateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryUpdate'
+          description: ''
+    patch:
+      operationId: v1_categories_partial_update
+      description: |-
+        CRUD для категорий.
+
+        list: GET /api/v1/categories/
+        create: POST /api/v1/categories/
+        retrieve: GET /api/v1/categories/{id}/
+        update: PUT /api/v1/categories/{id}/
+        destroy: DELETE /api/v1/categories/{id}/
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCategoryUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCategoryUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCategoryUpdateRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryUpdate'
+          description: ''
+    delete:
+      operationId: v1_categories_destroy
+      description: |-
+        CRUD для категорий.
+
+        list: GET /api/v1/categories/
+        create: POST /api/v1/categories/
+        retrieve: GET /api/v1/categories/{id}/
+        update: PUT /api/v1/categories/{id}/
+        destroy: DELETE /api/v1/categories/{id}/
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/categories/my/:
+    get:
+      operationId: v1_categories_my_retrieve
+      description: |-
+        Получить только пользовательские категории.
+        GET /api/v1/categories/my/
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+  /api/v1/categories/system/:
+    get:
+      operationId: v1_categories_system_retrieve
+      description: |-
+        Получить только системные категории.
+        GET /api/v1/categories/system/
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+  /api/v1/transactions/:
+    get:
+      operationId: v1_transactions_list
+      description: |-
+        CRUD для транзакций.
+
+        list: GET /api/v1/transactions/
+        create: POST /api/v1/transactions/
+        retrieve: GET /api/v1/transactions/{id}/
+        update: PUT /api/v1/transactions/{id}/
+        destroy: DELETE /api/v1/transactions/{id}/
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTransactionList'
+          description: ''
+    post:
+      operationId: v1_transactions_create
+      description: |-
+        CRUD для транзакций.
+
+        list: GET /api/v1/transactions/
+        create: POST /api/v1/transactions/
+        retrieve: GET /api/v1/transactions/{id}/
+        update: PUT /api/v1/transactions/{id}/
+        destroy: DELETE /api/v1/transactions/{id}/
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransactionCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransactionCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionCreate'
+          description: ''
+  /api/v1/transactions/{id}/:
+    get:
+      operationId: v1_transactions_retrieve
+      description: |-
+        CRUD для транзакций.
+
+        list: GET /api/v1/transactions/
+        create: POST /api/v1/transactions/
+        retrieve: GET /api/v1/transactions/{id}/
+        update: PUT /api/v1/transactions/{id}/
+        destroy: DELETE /api/v1/transactions/{id}/
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+          description: ''
+    put:
+      operationId: v1_transactions_update
+      description: |-
+        CRUD для транзакций.
+
+        list: GET /api/v1/transactions/
+        create: POST /api/v1/transactions/
+        retrieve: GET /api/v1/transactions/{id}/
+        update: PUT /api/v1/transactions/{id}/
+        destroy: DELETE /api/v1/transactions/{id}/
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransactionUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransactionUpdateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionUpdate'
+          description: ''
+    patch:
+      operationId: v1_transactions_partial_update
+      description: |-
+        CRUD для транзакций.
+
+        list: GET /api/v1/transactions/
+        create: POST /api/v1/transactions/
+        retrieve: GET /api/v1/transactions/{id}/
+        update: PUT /api/v1/transactions/{id}/
+        destroy: DELETE /api/v1/transactions/{id}/
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTransactionUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTransactionUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTransactionUpdateRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionUpdate'
+          description: ''
+    delete:
+      operationId: v1_transactions_destroy
+      description: |-
+        CRUD для транзакций.
+
+        list: GET /api/v1/transactions/
+        create: POST /api/v1/transactions/
+        retrieve: GET /api/v1/transactions/{id}/
+        update: PUT /api/v1/transactions/{id}/
+        destroy: DELETE /api/v1/transactions/{id}/
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/transactions/bulk/:
+    post:
+      operationId: v1_transactions_bulk_create
+      description: |-
+        Массовое создание транзакций (для SMS).
+        POST /api/v1/transactions/bulk/
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+          description: ''
+  /api/v1/transactions/daily_stats/:
+    get:
+      operationId: v1_transactions_daily_stats_retrieve
+      description: |-
+        Дневная статистика.
+        GET /api/v1/transactions/stats/daily/?days=30
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+          description: ''
+  /api/v1/transactions/monthly_stats/:
+    get:
+      operationId: v1_transactions_monthly_stats_retrieve
+      description: |-
+        Месячная статистика.
+        GET /api/v1/transactions/stats/monthly/?months=6
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+          description: ''
+  /api/v1/transactions/sms_parse/:
+    post:
+      operationId: v1_transactions_sms_parse_create
+      description: |-
+        Парсинг SMS и создание транзакции.
+        POST /api/v1/transactions/sms-parse/
+
+        Body:
+        {
+            "sms_text": "текст SMS",
+            "bank_phone": "+79000000900" (опционально)
+        }
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+          description: ''
+  /api/v1/transactions/stats_by_category/:
+    get:
+      operationId: v1_transactions_stats_by_category_retrieve
+      description: |-
+        Статистика по категориям за период.
+        GET /api/v1/transactions/stats/by-category/?start_date=2024-01-01&end_date=2024-01-31
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+          description: ''
+components:
+  schemas:
+    Category:
+      type: object
+      description: Serializer для категории.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: Название
+          maxLength: 100
+        type:
+          allOf:
+          - $ref: '#/components/schemas/TypeEnum'
+          default: expense
+          title: Тип
+        icon:
+          type: string
+          description: Название иконки
+          maxLength: 50
+        color:
+          type: string
+          description: Цвет в формате HEX
+          maxLength: 7
+        user:
+          type: integer
+          readOnly: true
+          nullable: true
+          title: Пользователь
+        is_system:
+          type: boolean
+          readOnly: true
+          default: false
+          description: Системная категория
+        transactions_count:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - is_system
+      - name
+      - transactions_count
+      - updated_at
+      - user
+    CategoryCreate:
+      type: object
+      description: Serializer для создания категории.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: Название
+          maxLength: 100
+        type:
+          allOf:
+          - $ref: '#/components/schemas/TypeEnum'
+          title: Тип
+        icon:
+          type: string
+          description: Название иконки
+          maxLength: 50
+        color:
+          type: string
+          description: Цвет в формате HEX
+          maxLength: 7
+      required:
+      - id
+      - name
+    CategoryCreateRequest:
+      type: object
+      description: Serializer для создания категории.
+      properties:
+        name:
+          type: string
+          minLength: 1
+          title: Название
+          maxLength: 100
+        type:
+          allOf:
+          - $ref: '#/components/schemas/TypeEnum'
+          title: Тип
+        icon:
+          type: string
+          minLength: 1
+          description: Название иконки
+          maxLength: 50
+        color:
+          type: string
+          minLength: 1
+          description: Цвет в формате HEX
+          maxLength: 7
+      required:
+      - name
+    CategoryUpdate:
+      type: object
+      description: Serializer для обновления категории.
+      properties:
+        name:
+          type: string
+          title: Название
+          maxLength: 100
+        icon:
+          type: string
+          description: Название иконки
+          maxLength: 50
+        color:
+          type: string
+          description: Цвет в формате HEX
+          maxLength: 7
+      required:
+      - name
+    CategoryUpdateRequest:
+      type: object
+      description: Serializer для обновления категории.
+      properties:
+        name:
+          type: string
+          minLength: 1
+          title: Название
+          maxLength: 100
+        icon:
+          type: string
+          minLength: 1
+          description: Название иконки
+          maxLength: 50
+        color:
+          type: string
+          minLength: 1
+          description: Цвет в формате HEX
+          maxLength: 7
+      required:
+      - name
+    Comment:
+      type: object
+      description: Serializer для комментариев.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        post:
+          type: integer
+          readOnly: true
+        author:
+          allOf:
+          - $ref: '#/components/schemas/UserMinimal'
+          readOnly: true
+        content:
+          type: string
+          title: Текст комментария
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - author
+      - content
+      - created_at
+      - id
+      - post
+      - updated_at
+    CommentRequest:
+      type: object
+      description: Serializer для комментариев.
+      properties:
+        content:
+          type: string
+          minLength: 1
+          title: Текст комментария
+      required:
+      - content
+    CustomTokenObtainPairRequest:
+      type: object
+      description: |-
+        Кастомный serializer для токенов с данными пользователя.
+        Позволяет использовать email вместо username для входа.
+      properties:
+        email:
+          type: string
+          writeOnly: true
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - email
+      - password
+    PaginatedCategoryList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
+    PaginatedCommentList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+    PaginatedPostList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+    PaginatedTransactionList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
+    PasswordResetConfirmRequest:
+      type: object
+      description: Serializer для подтверждения сброса пароля.
+      properties:
+        token:
+          type: string
+          writeOnly: true
+          minLength: 1
+          title: Токен
+        password:
+          type: string
+          writeOnly: true
+          minLength: 8
+          title: Новый пароль
+        password_confirm:
+          type: string
+          writeOnly: true
+          minLength: 8
+          title: Подтверждение пароля
+      required:
+      - password
+      - password_confirm
+      - token
+    PasswordResetRequest:
+      type: object
+      description: Serializer для запроса сброса пароля.
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+      - email
+    PasswordResetRequestRequest:
+      type: object
+      description: Serializer для запроса сброса пароля.
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+      required:
+      - email
+    PatchedCategoryUpdateRequest:
+      type: object
+      description: Serializer для обновления категории.
+      properties:
+        name:
+          type: string
+          minLength: 1
+          title: Название
+          maxLength: 100
+        icon:
+          type: string
+          minLength: 1
+          description: Название иконки
+          maxLength: 50
+        color:
+          type: string
+          minLength: 1
+          description: Цвет в формате HEX
+          maxLength: 7
+    PatchedCommentRequest:
+      type: object
+      description: Serializer для комментариев.
+      properties:
+        content:
+          type: string
+          minLength: 1
+          title: Текст комментария
+    PatchedPostCreateUpdateRequest:
+      type: object
+      description: Serializer для создания и обновления постов.
+      properties:
+        title:
+          type: string
+          minLength: 1
+          title: Заголовок
+          maxLength: 200
+        content:
+          type: string
+          minLength: 1
+          title: Содержимое
+        visibility:
+          allOf:
+          - $ref: '#/components/schemas/VisibilityEnum'
+          title: Видимость
+        image:
+          type: string
+          format: binary
+          nullable: true
+          title: Изображение
+    PatchedProfileRequest:
+      type: object
+      description: Serializer для профиля пользователя.
+      properties:
+        avatar:
+          type: string
+          format: binary
+          nullable: true
+          description: Аватар пользователя
+        bio:
+          type: string
+          nullable: true
+          description: Краткая информация о себе
+          maxLength: 500
+        currency:
+          type: string
+          minLength: 1
+          description: Код валюты (RUB, USD, EUR)
+          maxLength: 3
+    PatchedTransactionUpdateRequest:
+      type: object
+      description: Serializer для обновления транзакции.
+      properties:
+        category:
+          type: integer
+          nullable: true
+          title: Категория
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,13}(?:\.\d{0,2})?$
+          title: Сумма
+        description:
+          type: string
+          nullable: true
+          title: Описание
+        type:
+          allOf:
+          - $ref: '#/components/schemas/TypeEnum'
+          title: Тип
+        date:
+          type: string
+          format: date-time
+          title: Дата
+    PatchedUserRequest:
+      type: object
+      description: Serializer для пользователя.
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        username:
+          type: string
+          minLength: 1
+          title: Имя пользователя
+          description: Обязательное поле. Не более 150 символов. Только буквы, цифры
+            и символы @/./+/-/_.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        first_name:
+          type: string
+          title: Имя
+          maxLength: 150
+        last_name:
+          type: string
+          title: Фамилия
+          maxLength: 150
+    Post:
+      type: object
+      description: Serializer для постов.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        author:
+          allOf:
+          - $ref: '#/components/schemas/UserMinimal'
+          readOnly: true
+        title:
+          type: string
+          title: Заголовок
+          maxLength: 200
+        content:
+          type: string
+          title: Содержимое
+        visibility:
+          allOf:
+          - $ref: '#/components/schemas/VisibilityEnum'
+          title: Видимость
+        image:
+          type: string
+          format: uri
+          nullable: true
+          title: Изображение
+        image_url:
+          type: string
+          readOnly: true
+        likes:
+          type: integer
+          readOnly: true
+        comments_count:
+          type: string
+          readOnly: true
+        is_liked:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - author
+      - comments_count
+      - content
+      - created_at
+      - id
+      - image_url
+      - is_liked
+      - likes
+      - title
+      - updated_at
+    PostCreateUpdate:
+      type: object
+      description: Serializer для создания и обновления постов.
+      properties:
+        title:
+          type: string
+          title: Заголовок
+          maxLength: 200
+        content:
+          type: string
+          title: Содержимое
+        visibility:
+          allOf:
+          - $ref: '#/components/schemas/VisibilityEnum'
+          title: Видимость
+        image:
+          type: string
+          format: uri
+          nullable: true
+          title: Изображение
+      required:
+      - content
+      - title
+    PostCreateUpdateRequest:
+      type: object
+      description: Serializer для создания и обновления постов.
+      properties:
+        title:
+          type: string
+          minLength: 1
+          title: Заголовок
+          maxLength: 200
+        content:
+          type: string
+          minLength: 1
+          title: Содержимое
+        visibility:
+          allOf:
+          - $ref: '#/components/schemas/VisibilityEnum'
+          title: Видимость
+        image:
+          type: string
+          format: binary
+          nullable: true
+          title: Изображение
+      required:
+      - content
+      - title
+    PostRequest:
+      type: object
+      description: Serializer для постов.
+      properties:
+        author_id:
+          type: integer
+          writeOnly: true
+        title:
+          type: string
+          minLength: 1
+          title: Заголовок
+          maxLength: 200
+        content:
+          type: string
+          minLength: 1
+          title: Содержимое
+        visibility:
+          allOf:
+          - $ref: '#/components/schemas/VisibilityEnum'
+          title: Видимость
+        image:
+          type: string
+          format: binary
+          nullable: true
+          title: Изображение
+      required:
+      - author_id
+      - content
+      - title
+    Profile:
+      type: object
+      description: Serializer для профиля пользователя.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        avatar:
+          type: string
+          format: uri
+          nullable: true
+          description: Аватар пользователя
+        avatar_url:
+          type: string
+          readOnly: true
+        bio:
+          type: string
+          nullable: true
+          description: Краткая информация о себе
+          maxLength: 500
+        currency:
+          type: string
+          description: Код валюты (RUB, USD, EUR)
+          maxLength: 3
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - avatar_url
+      - created_at
+      - id
+      - updated_at
+    ProfileUpdate:
+      type: object
+      description: Serializer для обновления профиля пользователя.
+      properties:
+        avatar:
+          type: string
+          format: uri
+          nullable: true
+          description: Аватар пользователя
+        bio:
+          type: string
+          nullable: true
+          description: Краткая информация о себе
+          maxLength: 500
+        currency:
+          type: string
+          description: Код валюты (RUB, USD, EUR)
+          maxLength: 3
+    ProfileUpdateRequest:
+      type: object
+      description: Serializer для обновления профиля пользователя.
+      properties:
+        avatar:
+          type: string
+          format: binary
+          nullable: true
+          description: Аватар пользователя
+        bio:
+          type: string
+          nullable: true
+          description: Краткая информация о себе
+          maxLength: 500
+        currency:
+          type: string
+          minLength: 1
+          description: Код валюты (RUB, USD, EUR)
+          maxLength: 3
+    SourceEnum:
+      enum:
+      - manual
+      - sms
+      type: string
+      description: |-
+        * `manual` - Вручную
+        * `sms` - SMS
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+      required:
+      - access
+      - refresh
+    TokenRefreshRequest:
+      type: object
+      properties:
+        refresh:
+          type: string
+          minLength: 1
+      required:
+      - refresh
+    Transaction:
+      type: object
+      description: Serializer для транзакции.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        category:
+          type: integer
+          nullable: true
+          title: Категория
+        category_name:
+          type: string
+          readOnly: true
+        category_color:
+          type: string
+          readOnly: true
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,13}(?:\.\d{0,2})?$
+          title: Сумма
+        description:
+          type: string
+          nullable: true
+          title: Описание
+        type:
+          allOf:
+          - $ref: '#/components/schemas/TypeEnum'
+          title: Тип
+        source:
+          allOf:
+          - $ref: '#/components/schemas/SourceEnum'
+          readOnly: true
+          title: Источник
+        is_ai_parsed:
+          type: boolean
+          readOnly: true
+          title: Обработано AI
+        date:
+          type: string
+          format: date-time
+          title: Дата
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - amount
+      - category_color
+      - category_name
+      - created_at
+      - date
+      - id
+      - is_ai_parsed
+      - source
+      - updated_at
+    TransactionCreate:
+      type: object
+      description: Serializer для создания транзакции.
+      properties:
+        category:
+          type: integer
+          nullable: true
+          title: Категория
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,13}(?:\.\d{0,2})?$
+          title: Сумма
+        description:
+          type: string
+          nullable: true
+          title: Описание
+        type:
+          allOf:
+          - $ref: '#/components/schemas/TypeEnum'
+          title: Тип
+        date:
+          type: string
+          format: date-time
+          title: Дата
+      required:
+      - amount
+      - date
+    TransactionCreateRequest:
+      type: object
+      description: Serializer для создания транзакции.
+      properties:
+        category:
+          type: integer
+          nullable: true
+          title: Категория
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,13}(?:\.\d{0,2})?$
+          title: Сумма
+        description:
+          type: string
+          nullable: true
+          title: Описание
+        type:
+          allOf:
+          - $ref: '#/components/schemas/TypeEnum'
+          title: Тип
+        date:
+          type: string
+          format: date-time
+          title: Дата
+      required:
+      - amount
+      - date
+    TransactionRequest:
+      type: object
+      description: Serializer для транзакции.
+      properties:
+        category:
+          type: integer
+          nullable: true
+          title: Категория
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,13}(?:\.\d{0,2})?$
+          title: Сумма
+        description:
+          type: string
+          nullable: true
+          title: Описание
+        type:
+          allOf:
+          - $ref: '#/components/schemas/TypeEnum'
+          title: Тип
+        date:
+          type: string
+          format: date-time
+          title: Дата
+      required:
+      - amount
+      - date
+    TransactionUpdate:
+      type: object
+      description: Serializer для обновления транзакции.
+      properties:
+        category:
+          type: integer
+          nullable: true
+          title: Категория
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,13}(?:\.\d{0,2})?$
+          title: Сумма
+        description:
+          type: string
+          nullable: true
+          title: Описание
+        type:
+          allOf:
+          - $ref: '#/components/schemas/TypeEnum'
+          title: Тип
+        date:
+          type: string
+          format: date-time
+          title: Дата
+      required:
+      - amount
+      - date
+    TransactionUpdateRequest:
+      type: object
+      description: Serializer для обновления транзакции.
+      properties:
+        category:
+          type: integer
+          nullable: true
+          title: Категория
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,13}(?:\.\d{0,2})?$
+          title: Сумма
+        description:
+          type: string
+          nullable: true
+          title: Описание
+        type:
+          allOf:
+          - $ref: '#/components/schemas/TypeEnum'
+          title: Тип
+        date:
+          type: string
+          format: date-time
+          title: Дата
+      required:
+      - amount
+      - date
+    TypeEnum:
+      enum:
+      - expense
+      - income
+      type: string
+      description: |-
+        * `expense` - Расход
+        * `income` - Доход
+    User:
+      type: object
+      description: Serializer для пользователя.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        username:
+          type: string
+          title: Имя пользователя
+          description: Обязательное поле. Не более 150 символов. Только буквы, цифры
+            и символы @/./+/-/_.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        first_name:
+          type: string
+          title: Имя
+          maxLength: 150
+        last_name:
+          type: string
+          title: Фамилия
+          maxLength: 150
+        profile:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - email
+      - id
+      - profile
+      - username
+    UserCreate:
+      type: object
+      description: Serializer для регистрации пользователя.
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        username:
+          type: string
+          title: Имя пользователя
+          description: Обязательное поле. Не более 150 символов. Только буквы, цифры
+            и символы @/./+/-/_.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        first_name:
+          type: string
+          title: Имя
+          maxLength: 150
+        last_name:
+          type: string
+          title: Фамилия
+          maxLength: 150
+      required:
+      - email
+      - username
+    UserCreateRequest:
+      type: object
+      description: Serializer для регистрации пользователя.
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        username:
+          type: string
+          minLength: 1
+          title: Имя пользователя
+          description: Обязательное поле. Не более 150 символов. Только буквы, цифры
+            и символы @/./+/-/_.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        password:
+          type: string
+          writeOnly: true
+          minLength: 8
+          title: Пароль
+        password_confirm:
+          type: string
+          writeOnly: true
+          minLength: 8
+          title: Подтверждение пароля
+        first_name:
+          type: string
+          title: Имя
+          maxLength: 150
+        last_name:
+          type: string
+          title: Фамилия
+          maxLength: 150
+      required:
+      - email
+      - password
+      - password_confirm
+      - username
+    UserMinimal:
+      type: object
+      description: Минимальная информация о пользователе для отображения в постах.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          title: Имя пользователя
+          description: Обязательное поле. Не более 150 символов. Только буквы, цифры
+            и символы @/./+/-/_.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        avatar_url:
+          type: string
+          readOnly: true
+      required:
+      - avatar_url
+      - email
+      - id
+      - username
+    UserMinimalRequest:
+      type: object
+      description: Минимальная информация о пользователе для отображения в постах.
+      properties:
+        username:
+          type: string
+          minLength: 1
+          title: Имя пользователя
+          description: Обязательное поле. Не более 150 символов. Только буквы, цифры
+            и символы @/./+/-/_.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+      required:
+      - email
+      - username
+    UserRequest:
+      type: object
+      description: Serializer для пользователя.
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        username:
+          type: string
+          minLength: 1
+          title: Имя пользователя
+          description: Обязательное поле. Не более 150 символов. Только буквы, цифры
+            и символы @/./+/-/_.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        first_name:
+          type: string
+          title: Имя
+          maxLength: 150
+        last_name:
+          type: string
+          title: Фамилия
+          maxLength: 150
+      required:
+      - email
+      - username
+    VisibilityEnum:
+      enum:
+      - public
+      - private
+      type: string
+      description: |-
+        * `public` - Публичный
+        * `private` - Приватный
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+tags:
+- name: Auth
+  description: Аутентификация и управление профилем
+- name: Transactions
+  description: Управление транзакциями
+- name: Categories
+  description: Категории доходов/расходов
+- name: Analytics
+  description: Аналитика и AI рекомендации
+- name: Blog
+  description: Блог и комментарии

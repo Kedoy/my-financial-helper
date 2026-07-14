@@ -1,0 +1,45 @@
+# Django
+Django>=5.0
+djangorestframework>=3.14
+django-filter>=23.5
+
+# База данных
+psycopg2-binary>=2.9.9
+
+# Аутентификация
+djangorestframework-simplejwt>=5.3.1
+django-cors-headers>=4.3.1
+
+# Безопасность
+bcrypt>=4.1.2
+python-dotenv>=1.0.0
+
+# Утилиты
+Pillow>=10.0.0
+gunicorn>=21.2.0
+whitenoise>=6.6.0
+
+# Тестирование
+pytest>=7.4.3
+pytest-django>=4.7.0
+pytest-cov>=4.1.0
+factory-boy>=3.3.0
+
+# Линтинг
+black>=23.12.1
+flake8>=7.0.0
+isort>=5.13.2
+
+# AI (OpenRouter API)
+openai>=1.0.0
+requests>=2.31.0
+
+# Прогнозирование
+prophet>=1.1.5
+
+# Redis
+redis>=5.0.0
+django-redis>=5.4.0
+
+# Документация (Swagger/OpenAPI)
+drf-spectacular>=0.27.0
